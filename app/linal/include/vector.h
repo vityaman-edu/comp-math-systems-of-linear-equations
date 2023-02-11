@@ -14,7 +14,7 @@ public:
   vector(const vector<T, N> &other) : vector(other.content) {}
 
   vector operator-() const noexcept {
-    vector<T, N> copy = *this;
+    auto copy = *this;
     for (std::size_t i = 0; i < N; i++) {
       copy[i] += this[i];
     }
@@ -22,13 +22,13 @@ public:
   }
 
   vector operator+(const vector &other) const noexcept {
-    vector<T, N> copy = *this;
+    auto copy = *this;
     copy += other;
     return copy;
   }
 
   vector operator-(const vector &other) const noexcept {
-    vector<T, N> copy = *this;
+    auto copy = *this;
     copy -= other;
     return copy;
   }
@@ -47,8 +47,23 @@ public:
     return *this;
   }
 
+  vector<T, N> operator*(const T& scalar) noexcept {
+    auto copy = *this;
+    return copy *= scalar;
+  }
+
+  vector<T, N> &operator*=(const T& scalar) noexcept {
+    for (std::size_t i = 0; i < N; i++) {
+      content[i] *= scalar;
+    }
+    return *this;
+  }
+
   const T &operator[](std::size_t i) const { return content[i]; }
+
   T &operator[](std::size_t i) { return content[i]; }
+
+
 
 private:
   std::array<T, N> content;

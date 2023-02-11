@@ -14,5 +14,8 @@ int main(int argc, char **argv) {
   std::cout << b << std::endl;
   a += b;
   std::cout << a << std::endl;
+  std::cout << a * 10 << std::endl;
+  a *= 10;
+  std::cout << a << std::endl;
   return 0;
 }

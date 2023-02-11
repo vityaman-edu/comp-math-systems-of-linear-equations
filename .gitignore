@@ -1,6 +1,11 @@
-build/
-*.o
+# Bazel
+bazel-*
 
+
+# VSCode
+.vscode/
+
+# Emacs
 *~
 \#*\#
 /.emacs.desktop

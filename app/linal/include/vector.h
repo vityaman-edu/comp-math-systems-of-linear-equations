@@ -6,8 +6,15 @@ namespace linal {
 
 template <typename T, std::size_t N> class vector {
 public:
-  vector() { 
-    
+  vector() {
+    std::cerr << "vector<" << N << "> of " << typeid(T).name() << " created"
+              << std::endl;
+  }
+
+  vector(const T &value) {
+    for (std::size_t i = 0; i < N; i++) {
+      content[i] = value;
+    }
   }
 
   vector(const T (&elements)[N]) : vector() {
@@ -67,14 +74,6 @@ public:
   const T &operator[](std::size_t i) const { return content[i]; }
 
   T &operator[](std::size_t i) { return content[i]; }
-
-  static vector<T, N> zero() {
-    auto zero = vector();
-    for (std::size_t i = 0; i < N; i++) {
-      zero[i] = 0;
-    }
-    return zero;
-  }
 
 protected:
   T content[N];

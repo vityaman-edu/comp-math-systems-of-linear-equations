@@ -76,7 +76,7 @@ public:
     return zero;
   }
 
-private:
+protected:
   T content[N];
 };
 

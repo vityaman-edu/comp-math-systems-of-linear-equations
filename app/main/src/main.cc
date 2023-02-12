@@ -8,6 +8,6 @@ int main(int argc, char **argv) {
     {3, 4, 5},
     {6, 7, 8}
   });
-  std::cout << matrix.as_vector() << std::endl;
+  std::cout << matrix << std::endl;
   return 0;
 }

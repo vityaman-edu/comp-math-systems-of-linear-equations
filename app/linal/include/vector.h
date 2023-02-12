@@ -1,4 +1,5 @@
 #pragma once
+#include "matrix.h"
 #include <cstdint>
 #include <iostream>
 
@@ -7,8 +8,8 @@ namespace linal {
 template <typename T, std::size_t N> class vector {
 public:
   vector() {
-    std::cerr << "vector<" << N << "> of " << typeid(T).name() << " created"
-              << std::endl;
+    // std::cerr << "vector<" << N << "> of " << typeid(T).name() << " created"
+    // << std::endl;
   }
 
   vector(const T (&elements)[N]) : vector() {
@@ -69,7 +70,7 @@ public:
 
   T &operator[](std::size_t i) { return content[i]; }
 
-  static vector zero() {
+  static vector zero() noexcept {
     vector zero;
     for (std::size_t i = 0; i < N; i++) {
       zero[i] = 0;
@@ -80,6 +81,15 @@ public:
 protected:
   T content[N];
 };
+
+template <typename T, std::size_t N>
+T combine(const vector<T, N> &a, const vector<T, N> &x) noexcept {
+  T sum = 0;
+  for (std::size_t i = 0; i < N; i++) {
+    sum += a[i] * x[i];
+  }
+  return sum;
+}
 
 template <typename T, std::size_t N>
 std::ostream &operator<<(std::ostream &stream, const vector<T, N> &vector) {

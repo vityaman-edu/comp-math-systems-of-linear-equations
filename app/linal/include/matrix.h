@@ -15,6 +15,24 @@ public:
     }
   }
 
+  matrix operator*(const T &scalar) noexcept {
+    matrix copy = *this;
+    copy *= scalar;
+    return copy;
+  }
+
+  matrix &operator*=(const T &scalar) noexcept {
+    for (std::size_t i = 0; i < R; i++) {
+      (*this)[i] *= scalar;
+    }
+  }
+
+  void apply_inplace(vector<T, C> &vector) const noexcept {
+    for (std::size_t i = 0; i < C; i++) {
+      vector[i] = combine((*this)[i], vector);
+    }
+  }
+
   static matrix zero() {
     matrix zero;
     for (std::size_t i = 0; i < R; i++) {

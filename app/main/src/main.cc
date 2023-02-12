@@ -4,20 +4,17 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-  const std::size_t N = 5;
-  typedef float F;
-  auto a = linal::matrix<F, N, N>({
-    {5, 1, 0, 0, 0},
-    {0, 1, 0, 0, 0},
-    {0, 1, 6, 0, 0},
-    {0, 1, 0, 3, 0},
-    {0, 1, 0, 0, 2}
-  });
-  auto b = linal::vector<F, N>(); 
-  auto A = sle::method::iteration::diagonal_predominant_matrix<F, N>::make(a);
-  A += a;
-  std::cout << A << std::endl;
+  const std::size_t N = 3;
+  typedef double F;
+
+  auto a = linal::matrix<F, N, N>(
+      {{4, 0.24, -0.08}, {0.09, 3, -0.15}, {0.04, -0.08, 4}});
+  auto b = linal::vector<F, N>({8, 9, 20});
+
   std::cout << a << std::endl;
+  std::cout << b << std::endl;
+
+  auto A = sle::method::iteration::diagonal_predominant_matrix<F, N>::make(a);
   std::cout << sle::method::iteration::solve(A, b) << std::endl;
   return 0;
 }

@@ -2,7 +2,6 @@
 #include "app/linal/include/matrix.h"
 #include "app/linal/include/vector.h"
 #include "diagonal-predominance.h"
-#include <cmath>
 #include <iostream>
 
 namespace sle {

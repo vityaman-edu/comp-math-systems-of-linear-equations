@@ -1,5 +1,4 @@
 #pragma once
-#include <array>
 #include <cstdint>
 #include <iostream>
 
@@ -7,8 +6,14 @@ namespace linal {
 
 template <typename T, std::size_t N> class vector {
 public:
-  vector(const std::array<T, N> &content) : content(content) {
-    std::cout << "Vector<" << N << "> created" << std::endl;
+  vector() { 
+    
+  }
+
+  vector(const T (&elements)[N]) : vector() {
+    for (std::size_t i = 0; i < N; i++) {
+      content[i] = elements[i];
+    }
   }
 
   vector(const vector<T, N> &other) : vector(other.content) {}
@@ -47,12 +52,12 @@ public:
     return *this;
   }
 
-  vector<T, N> operator*(const T& scalar) noexcept {
+  vector<T, N> operator*(const T &scalar) noexcept {
     auto copy = *this;
     return copy *= scalar;
   }
 
-  vector<T, N> &operator*=(const T& scalar) noexcept {
+  vector<T, N> &operator*=(const T &scalar) noexcept {
     for (std::size_t i = 0; i < N; i++) {
       content[i] *= scalar;
     }
@@ -63,10 +68,16 @@ public:
 
   T &operator[](std::size_t i) { return content[i]; }
 
-
+  static vector<T, N> zero() {
+    auto zero = vector();
+    for (std::size_t i = 0; i < N; i++) {
+      zero[i] = 0;
+    }
+    return zero;
+  }
 
 private:
-  std::array<T, N> content;
+  T content[N];
 };
 
 template <typename T, std::size_t N>

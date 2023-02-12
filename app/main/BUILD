@@ -5,5 +5,6 @@ cc_binary(
     srcs = glob(["src/**/*.cc"]),
     deps = [
         "//app/linal:linal",
+        "//app/sle:sle",
     ],
 )

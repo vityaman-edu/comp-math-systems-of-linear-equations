@@ -6,6 +6,10 @@
 int main(int argc, char **argv) {
   auto a = linal::matrix<float, 3, 3>::id();
   auto b = linal::vector<float, 3>(); 
-  std::cout << sle::method::iteration::solve(a, b) << std::endl;
+  auto A = sle::method::iteration::diagonal_predominant_matrix<float, 3>::make(a);
+  A += a;
+  std::cout << A << std::endl;
+  std::cout << a << std::endl;
+  std::cout << sle::method::iteration::solve(A, b) << std::endl;
   return 0;
 }

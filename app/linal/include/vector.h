@@ -7,10 +7,7 @@ namespace linal {
 
 template <typename T, std::size_t N> class vector {
 public:
-  vector() {
-    // std::cerr << "vector<" << N << "> of " << typeid(T).name() << " created"
-    // << std::endl;
-  }
+  vector() {}
 
   vector(const T (&elements)[N]) : vector() {
     for (std::size_t i = 0; i < N; i++) {

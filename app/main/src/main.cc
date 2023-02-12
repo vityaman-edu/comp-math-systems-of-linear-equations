@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
   typedef double F;
 
   auto a = linal::matrix<F, N, N>(
-      {{4, 0.24, -0.08}, {0.09, 3, -0.15}, {0.04, -0.08, 4}});
+      { {0.09, 3, -0.15}, {4, 0.24, -0.08}, {0.04, -0.08, 4}});
   auto b = linal::vector<F, N>({8, 9, 20});
 
   std::cout << a << std::endl;

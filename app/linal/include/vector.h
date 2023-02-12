@@ -11,12 +11,6 @@ public:
               << std::endl;
   }
 
-  vector(const T &value) {
-    for (std::size_t i = 0; i < N; i++) {
-      content[i] = value;
-    }
-  }
-
   vector(const T (&elements)[N]) : vector() {
     for (std::size_t i = 0; i < N; i++) {
       content[i] = elements[i];
@@ -74,6 +68,14 @@ public:
   const T &operator[](std::size_t i) const { return content[i]; }
 
   T &operator[](std::size_t i) { return content[i]; }
+
+  static vector zero() {
+    vector zero;
+    for (std::size_t i = 0; i < N; i++) {
+      zero[i] = 0;
+    }
+    return zero;
+  }
 
 protected:
   T content[N];

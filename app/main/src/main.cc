@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-  linal::matrix<int, 3, 3> matrix = 0;
+  auto matrix = linal::matrix<int, 3, 3>::id();
   std::cout << matrix << std::endl;
   return 0;
 }

@@ -3,6 +3,7 @@
 #include "app/linal/include/vector.h"
 #include "diagonal-predominance.h"
 #include <cmath>
+#include <functional>
 #include <iostream>
 
 namespace sle {
@@ -36,30 +37,44 @@ build_beta(const diagonal_predominant_matrix<T, N> &a,
 }
 
 template <typename T, std::size_t N>
-T max_by_abs_component(const linal::vector<T, N> &x) noexcept {
-  T max = std::abs(x[0]);
+T max_component(const linal::vector<T, N> &x) noexcept {
+  T max = x[0];
   for (std::size_t i = 1; i < N; i++) {
-    max = std::max(max, std::abs(x[i]));
+    max = std::max(max, x[i]);
   }
   return max;
 }
 
+template <typename T, std::size_t N> struct result {
+  linal::vector<T, N> value;
+  std::size_t steps_count;
+  linal::vector<T, N> error;
+};
+
 template <typename T, std::size_t N>
-linal::vector<T, N> solve(const diagonal_predominant_matrix<T, N> &a,
-                          const linal::vector<T, N> &b) {
+result<T, N> solve(const diagonal_predominant_matrix<T, N> &a,
+                   const linal::vector<T, N> &b) {
   // TODO: support abstract fields
   const T eps = 0.01;
   const auto alpha = build_alpha(a);
   const auto beta = build_beta(a, b);
 
+  std::size_t steps_count = 0;
+
   linal::vector<T, N> x, prev;
+
   do {
     prev = x;
     alpha.apply_inplace(x);
     x += beta;
-  } while (max_by_abs_component<T, N>(prev - x) > eps);
 
-  return x;
+    steps_count += 1;
+    auto error = linal::map<T, T, N>(prev - x, [](T v) { return std::abs(v); });
+
+    if (max_component<T, N>(error) < eps) {
+      return {.value = x, .steps_count = steps_count, .error = error};
+    }
+  } while (true);
 }
 
 } // namespace iteration

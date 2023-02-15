@@ -1,6 +1,7 @@
 #pragma once
 #include "matrix.h"
 #include <cstdint>
+#include <functional>
 #include <iostream>
 
 namespace linal {
@@ -51,7 +52,7 @@ public:
     return *this;
   }
 
-  vector<T, N> operator*(const T &scalar) noexcept {
+  vector<T, N> operator*(const T &scalar) const noexcept {
     auto copy = *this;
     return copy *= scalar;
   }
@@ -79,6 +80,15 @@ protected:
   T content[N];
 };
 
+template <typename T, typename U, std::size_t N>
+vector<U, N> map(const vector<T, N> &vec, const std::function<U(T)> &f) {
+  auto copy = vec;
+  for (std::size_t i = 0; i < N; i++) {
+    copy[i] = f(vec[i]);
+  }
+  return copy;
+}
+
 template <typename T, std::size_t N>
 T combine(const vector<T, N> &a, const vector<T, N> &x) noexcept {
   T sum = 0;
@@ -98,6 +108,14 @@ std::ostream &operator<<(std::ostream &stream, const vector<T, N> &vector) {
     stream << vector[N - 1];
   }
   stream << " }";
+  return stream;
+}
+
+template <typename T, std::size_t N>
+std::istream &operator<<(std::istream &stream, const vector<T, N> &vector) {
+  for (std::size_t i = 0; i < N; i++) {
+    stream >> vector[i];
+  }
   return stream;
 }
 

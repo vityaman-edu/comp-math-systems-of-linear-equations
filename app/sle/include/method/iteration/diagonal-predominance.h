@@ -50,7 +50,7 @@ public:
       T row_abs_sum = sum_by_abs(row);
       for (std::size_t j = 0; j < N; j++) {
         if (row_abs_sum <= 2 * std::abs(row[j])) {
-          row_candidates[i].insert(j);
+          row_candidates[j].insert(i);
         }
       }
     }
@@ -75,7 +75,7 @@ public:
                           std::inserter(diff, diff.end()));
 
       if (diff.size() == 0) {
-        throw std::invalid_argument("matrix can't make diagonal predominance");
+        throw std::invalid_argument("matrix can't be made diagonal predominant");
       }
 
       auto candidate = *diff.begin();
@@ -85,6 +85,7 @@ public:
 
     diagonal_predominant_matrix<T, N> result;
     for (std::size_t i = 0; i < N; i++) {
+      std::cout << indexes[i] << std::endl;
       result[i] = other[indexes[i]];
     }
     return result;

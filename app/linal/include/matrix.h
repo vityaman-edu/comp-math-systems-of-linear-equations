@@ -17,8 +17,7 @@ public:
 
   matrix operator*(const T &scalar) noexcept {
     matrix copy = *this;
-    copy *= scalar;
-    return copy;
+    return copy *= scalar;;
   }
 
   matrix &operator*=(const T &scalar) noexcept {

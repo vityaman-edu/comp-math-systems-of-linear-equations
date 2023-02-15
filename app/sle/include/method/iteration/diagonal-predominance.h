@@ -33,6 +33,8 @@ static bool has_diagonal_predominance(const linal::matrix<T, N, N> &matrix) {
 template <typename T, std::size_t N>
 class diagonal_predominant_matrix : public linal::matrix<T, N, N> {
 private:
+  diagonal_predominant_matrix() : linal::matrix<T, N, N>() {} 
+
   diagonal_predominant_matrix(const linal::matrix<T, N, N> &other)
       : linal::matrix<T, N, N>(other) {}
 
@@ -81,7 +83,7 @@ public:
       indexes[i] = candidate;
     }
 
-    auto result = diagonal_predominant_matrix<T, N>(other);
+    diagonal_predominant_matrix<T, N> result;
     for (std::size_t i = 0; i < N; i++) {
       result[i] = other[indexes[i]];
     }

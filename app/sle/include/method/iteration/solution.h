@@ -49,9 +49,7 @@ template <typename T, std::size_t N> struct result {
 };
 
 template <typename T, std::size_t N>
-result<T, N> solve(const valid_sle<T, N> &sle) {
-  // TODO: support abstract fields
-  const T EPS = 0.0001;
+result<T, N> solve(const valid_sle<T, N> &sle, const T eps) {
   const auto alpha = build_alpha(sle);
   const auto beta = build_beta(sle);
 
@@ -63,9 +61,9 @@ result<T, N> solve(const valid_sle<T, N> &sle) {
     x += beta;
 
     steps_count += 1;
-    auto error = linal::map<T, T, N>(prev - x, [](T v) { return std::abs(v); });
+    auto error = linal::map<T, T, N>(prev - x, [](T v) { return std::fabs(v); });
 
-    if (max_component<T, N>(error) < EPS) {
+    if (max_component<T, N>(error) < eps) {
       return {.value = x, .steps_count = steps_count, .error = error};
     }
   } while (true);

@@ -10,14 +10,42 @@ int main(int argc, char **argv) {
     freopen(filename.c_str(), "r", stdin);
   }
 
-  const std::size_t N = 3;
+  const std::size_t N = 20;
   typedef float F;
+  const F DUMMY = 600;
+
+  F eps;
+  std::cin >> eps;
 
   std::size_t size;
   std::cin >> size;
 
-  linal::matrix<F, N, N> a;
-  linal::vector<F, N> b;
+  // TODO: walkaround UB
+  const F a_init[N][N] = {
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+  linal::matrix<F, N, N> a(a_init);
+  const F b_init[N] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  linal::vector<F, N> b(b_init);
 
   for (std::size_t i = 0; i < size; i++) {
     for (std::size_t j = 0; j < size; j++) {
@@ -27,19 +55,13 @@ int main(int argc, char **argv) {
   }
 
   for (std::size_t i = size; i < N; i++) {
-    for (std::size_t j = size; j < N; j++) {
-      a[i][j] = 0;
-    }
-  }
-
-  for (std::size_t i = size; i < N; i++) {
-    a[i][i] = 1;
-    b[i] = 1;
+    a[i][i] = DUMMY;
+    b[i] = DUMMY;
   }
 
   try {
     auto sle = sle::method::iteration::valid_sle<F, N>::make(a, b);
-    auto result = sle::method::iteration::solve(sle);
+    auto result = sle::method::iteration::solve(sle, eps);
     std::cout << "result.value = " << result.value << std::endl;
     std::cout << "result.error = " << result.error << std::endl;
     std::cout << "result.steps_count = " << result.steps_count << std::endl;

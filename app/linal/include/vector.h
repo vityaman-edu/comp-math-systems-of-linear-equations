@@ -8,7 +8,9 @@ namespace linal {
 
 template <typename T, std::size_t N> class vector {
 public:
-  vector() {}
+  vector() {
+    
+  }
 
   vector(const T (&elements)[N]) : vector() {
     for (std::size_t i = 0; i < N; i++) {

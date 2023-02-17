@@ -15,7 +15,7 @@ template <typename T, std::size_t N>
 static T sum_by_abs(const linal::vector<T, N> &vector) {
   T sum = 0;
   for (std::size_t i = 0; i < N; i++) {
-    sum += std::abs(vector[i]);
+    sum += std::fabs(vector[i]);
   }
   return sum;
 }
@@ -41,7 +41,7 @@ public:
       const auto &row = a[i];
       T row_abs_sum = sum_by_abs(row);
       for (std::size_t j = 0; j < N; j++) {
-        if (row_abs_sum <= 2 * std::abs(row[j])) {
+        if (row_abs_sum <= 2 * std::fabs(row[j])) {
           row_candidates[j].insert(i);
         }
       }
@@ -57,6 +57,7 @@ public:
     };
     std::sort(indexes, indexes + N, less_by_candidates_count);
 
+    std::size_t suitable[N];
     std::set<std::size_t> used_rows;
     for (std::size_t i = 0; i < N; i++) {
       const auto &candidates = row_candidates[indexes[i]];
@@ -71,15 +72,20 @@ public:
             "matrix can't be made diagonal predominant");
       }
 
-      auto candidate = *diff.begin();
+      std::size_t candidate;
+      for (auto c : diff) {
+        candidate = c;
+        break;
+      }
+
       used_rows.insert(candidate);
-      indexes[i] = candidate;
+      suitable[indexes[i]] = candidate;
     }
 
     valid_sle<T, N> result;
     for (std::size_t i = 0; i < N; i++) {
-      result.a[i] = a[indexes[i]];
-      result.b[i] = b[indexes[i]];
+      result.a[i] = a[suitable[i]];
+      result.b[i] = b[suitable[i]];
     }
     return result;
   }

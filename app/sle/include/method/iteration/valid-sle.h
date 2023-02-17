@@ -12,7 +12,7 @@ namespace method {
 namespace iteration {
 
 template <typename T, std::size_t N>
-static T sum_by_abs(const linal::vector<T, N> vector) {
+static T sum_by_abs(const linal::vector<T, N> &vector) {
   T sum = 0;
   for (std::size_t i = 0; i < N; i++) {
     sum += std::abs(vector[i]);
@@ -20,33 +20,25 @@ static T sum_by_abs(const linal::vector<T, N> vector) {
   return sum;
 }
 
-template <typename T, std::size_t N>
-static bool has_diagonal_predominance(const linal::matrix<T, N, N> &matrix) {
-  for (std::size_t i = 0; i < N; i++) {
-    if (2 * std::abs(matrix[i][i]) < sum_by_abs(matrix[i])) {
-      return false;
-    }
-  }
-  return true;
-}
-
-template <typename T, std::size_t N>
-class diagonal_predominant_matrix : public linal::matrix<T, N, N> {
+template <typename T, std::size_t N> class valid_sle {
 private:
-  diagonal_predominant_matrix() : linal::matrix<T, N, N>() {} 
-
-  diagonal_predominant_matrix(const linal::matrix<T, N, N> &other)
-      : linal::matrix<T, N, N>(other) {}
+  linal::matrix<T, N, N> a;
+  linal::vector<T, N> b;
 
 public:
-  static diagonal_predominant_matrix make(const linal::matrix<T, N, N> &other) {
+  const linal::matrix<T, N, N> &left() const noexcept { return a; }
+
+  const linal::vector<T, N> &right() const noexcept { return b; }
+
+  static valid_sle make(const linal::matrix<T, N, N> &a,
+                        const linal::vector<T, N> &b) {
     std::set<std::size_t> row_candidates[N];
     for (std::size_t i = 0; i < N; i++) {
       row_candidates[i] = std::set<std::size_t>();
     }
 
     for (std::size_t i = 0; i < N; i++) {
-      const auto &row = other[i];
+      const auto &row = a[i];
       T row_abs_sum = sum_by_abs(row);
       for (std::size_t j = 0; j < N; j++) {
         if (row_abs_sum <= 2 * std::abs(row[j])) {
@@ -75,7 +67,8 @@ public:
                           std::inserter(diff, diff.end()));
 
       if (diff.size() == 0) {
-        throw std::invalid_argument("matrix can't be made diagonal predominant");
+        throw std::invalid_argument(
+            "matrix can't be made diagonal predominant");
       }
 
       auto candidate = *diff.begin();
@@ -83,10 +76,10 @@ public:
       indexes[i] = candidate;
     }
 
-    diagonal_predominant_matrix<T, N> result;
+    valid_sle<T, N> result;
     for (std::size_t i = 0; i < N; i++) {
-      std::cout << indexes[i] << std::endl;
-      result[i] = other[indexes[i]];
+      result.a[i] = a[indexes[i]];
+      result.b[i] = b[indexes[i]];
     }
     return result;
   }

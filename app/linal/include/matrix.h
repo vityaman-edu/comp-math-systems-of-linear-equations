@@ -17,18 +17,13 @@ public:
 
   matrix operator*(const T &scalar) noexcept {
     matrix copy = *this;
-    return copy *= scalar;;
+    return copy *= scalar;
+    ;
   }
 
   matrix &operator*=(const T &scalar) noexcept {
     for (std::size_t i = 0; i < R; i++) {
       (*this)[i] *= scalar;
-    }
-  }
-
-  void apply_inplace(vector<T, C> &vector) const noexcept {
-    for (std::size_t i = 0; i < C; i++) {
-      vector[i] = combine((*this)[i], vector);
     }
   }
 
@@ -50,5 +45,15 @@ public:
     return id;
   }
 };
+
+template <typename T, std::size_t R, std::size_t C>
+vector<T, R> operator*(const matrix<T, R, C> &m,
+                       const vector<T, C> &v) noexcept {
+  vector<T, R> result;
+  for (std::size_t i = 0; i < R; i++) {
+    result[i] = combine(m[i], v);
+  }
+  return result;
+}
 
 }; // namespace linal

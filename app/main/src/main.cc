@@ -38,9 +38,8 @@ int main(int argc, char **argv) {
   }
 
   try {
-    auto A = sle::method::iteration::diagonal_predominant_matrix<F, N>::make(a);
-    std::cout << A << std::endl;
-    auto result = sle::method::iteration::solve(A, b);
+    auto sle = sle::method::iteration::valid_sle<F, N>::make(a, b);
+    auto result = sle::method::iteration::solve(sle);
     std::cout << "result.value = " << result.value << std::endl;
     std::cout << "result.error = " << result.error << std::endl;
     std::cout << "result.steps_count = " << result.steps_count << std::endl;

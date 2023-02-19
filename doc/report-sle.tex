@@ -15,6 +15,7 @@
 \usepackage{caption}
 \usepackage{csquotes}
 \usepackage{hyperref}
+\usepackage{listings}
 
 \pgfplotsset{compat=1.18}
 \hypersetup{
@@ -27,9 +28,33 @@
   },
 }
 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.99,0.99,0.99}
+
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},   
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2
+}
+
+\lstset{style=mystyle}
+
 \begin{document}
-
-
 
 \begin{titlepage}
     \begin{center}
@@ -115,35 +140,83 @@
 поиска совершенного паросочетания в нашем графе.
 Кажется, это что-то связанное с теоремой Холла о парасочетании
 в двудольном графе... Доказательство теоремы дает нам алгоритм.
-(За слова не отвечаю). Мне лень описывать алгоритм, но вы можете
-посмотреть его реализацию в файле \href{https://github.com/vityaman-edu/comp-math-systems-of-linear-equations/blob/trunk/app/sle/include/method/iteration/diagonal-predominance.h}{diagonal-predominance.h}
+(За слова не отвечаю). Любопытный читатель может ознакомиться с реализацией
+алгоритма в файле \href{https://github.com/vityaman-edu/comp-math-systems-of-linear-equations/blob/trunk/app/sle/include/method/iteration/diagonal-predominance.h}{diagonal-predominance.h}
+
+\lstinputlisting[
+    language={C++},
+    caption={Попытка приведения СЛУ к диагональному преобладанию},
+    linerange={33-91}
+]{../app/sle/include/method/iteration/valid-sle.h}
+
+\section{Реализация метода итераций на языке C++}
+
+\lstinputlisting[
+    language={C++},
+    caption={Реализация метода итераций на языке C++},
+    linerange={51-70}
+]{../app/sle/include/method/iteration/solution.h}
+
+\section{Примеры работы}
+\subsection{Чтение из файла}
+
+\lstinputlisting[
+    caption={Входные данные из файла 1}
+]{../res/1.txt}
+
+\begin{lstlisting}[caption={Вывод программы 1}]
+result.value = { 1.00001, 1.00001, 1.00002 }
+result.error = { 4.48823e-05, 5.6386e-05, 7.11679e-05 }
+result.steps_count = 9
+\end{lstlisting}
+
+\subsection{Чтение из консоли}
+
+\begin{lstlisting}[caption={Использование программы из консоли}]
+$ bazel-bin/app/main/app
+0.1 3
+2 2 10 14
+10 1 1 12
+2 10 1 13
+result.value = { 1.01539, 1.01419, 1.02278 }
+result.error = { 0.0493588, 0.0941295, 0.0967236 }
+result.steps_count = 4
+\end{lstlisting}
+
+
+\section{Вывод}
+
+Метод итераций оказался достаточно эффективным
+для решения СЛУ. Кажется, что он позволяет
+добиться достаточной точности за относительно
+небольшое количество итераций. Несмотря
+на то, что сам алгоритм дает лишь
+приблизительный ответ, он не уступает прямым
+в точности, ведь позволяет ее контролировать,
+а в жизни нам часто достаточно лишь примерного
+ответа до нескольких знаков после запятой.
 
 
 \begin{thebibliography}{9}
 
     \bibitem{DemidovichMaron1966ru}
-    \href{
-        https://ikfia.ysn.ru/wp-content/uploads/2018/01/DemidovichMaron1966ru.pdf
-    }{
-        Демидович Б. П., Марон И. А. - "Основы вычислительной математики"
-    }
+    Демидович Б. П., Марон И. А.
+    Основы вычислительной математики /
+    Демидович Б. П., Марон И. А. -
+    М.: Наука, 1966. -
+    294-302, 301 c.
+
 
     \bibitem{DvkLinal2023Itmo}
-    \href{
-        https://logic.pdmi.ras.ru/~dvk/ITMO/Algebra/2022-23/5_Lin_space.pdf
-    }{
-        Карпов Д. В. - Лекции по Линейной алгебре в университете ИТМО
-        2022 - 2023 гг.
-    }
+    Лекции по Линейной алгебре в университете ИТМО 
+    2022 - 2023 гг / Карпов Д. В. \\
+    \url{https://logic.pdmi.ras.ru/~dvk/ITMO/Algebra/2022-23/5_Lin_space.pdf}
 
     \bibitem{DvkLinal2022Itmo}
-    \href{
-        https://logic.pdmi.ras.ru/~dvk/ITMO/DM/2021-22/3_matchings.pdf
-    }{
-        Карпов Д. В. - Лекции по Теории графов в университете ИТМО
-        2021 - 2022 гг.
-    }
-
+    Лекции по Теории графов в университете ИТМО
+    2021 - 2022 гг / Карпов Д. В. \\
+    \url{https://logic.pdmi.ras.ru/~dvk/ITMO/DM/2021-22/3_matchings.pdf}
+    
 \end{thebibliography}
 
 \end{document}

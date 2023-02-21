@@ -4,6 +4,22 @@
 #include <fstream>
 #include <iostream>
 
+template <typename T, std::size_t N>
+void vector_print(
+  const std::string& prefix,
+  const linal::vector<T, N>& vec,
+  std::size_t n
+) {
+  std::cout << prefix << " { ";
+  for (std::size_t i = 0; i < n - 1; i++) {
+    std::cout << vec[i] << ", ";
+  }
+  if (1 < n) {
+    std::cout << vec[n - 1];
+  }
+  std::cout << " }"  << std::endl;
+}
+
 int main(int argc, char **argv) {
   if (argc > 1) {
     std::string filename(argv[1]);
@@ -62,8 +78,8 @@ int main(int argc, char **argv) {
   try {
     auto sle = sle::method::iteration::valid_sle<F, N>::make(a, b);
     auto result = sle::method::iteration::solve(sle, eps);
-    std::cout << "result.value = " << result.value << std::endl;
-    std::cout << "result.error = " << result.error << std::endl;
+    vector_print("result.value = ", result.value, size);
+    vector_print("result.error = ", result.error, size);
     std::cout << "result.steps_count = " << result.steps_count << std::endl;
   } catch (std::logic_error &e) {
     std::cerr << "error: " << e.what() << std::endl;

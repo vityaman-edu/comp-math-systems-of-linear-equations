@@ -2,9 +2,9 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "app",
-    srcs = glob(["src/**/*.cc"]),
+    srcs = glob(["**/*.cc"]),
     deps = [
-        "//app/linal:linal",
-        "//app/sle:sle",
+        "//math/linal:lib",
+        "//math/sle:lib",
     ],
 )

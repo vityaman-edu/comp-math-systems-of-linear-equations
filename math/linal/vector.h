@@ -8,9 +8,7 @@ namespace linal {
 
 template <typename T, std::size_t N> class vector {
 public:
-  vector() {
-    
-  }
+  vector() {}
 
   vector(const T (&elements)[N]) : vector() {
     for (std::size_t i = 0; i < N; i++) {
@@ -18,49 +16,53 @@ public:
     }
   }
 
-  vector(const vector<T, N> &other) : vector(other.content) {}
+  vector(const vector<T, N>& other)
+      : vector(other.content) {}
 
-  vector operator+(const vector &other) const noexcept {
+  vector operator+(const vector& other) const noexcept {
     auto copy = *this;
     copy += other;
     return copy;
   }
 
-  vector operator-(const vector &other) const noexcept {
+  vector operator-(const vector& other) const noexcept {
     auto copy = *this;
     copy -= other;
     return copy;
   }
 
-  vector &operator+=(const vector &other) noexcept {
+  vector& operator+=(const vector& other) noexcept {
     for (std::size_t i = 0; i < N; i++) {
       content[i] += other[i];
     }
     return *this;
   }
 
-  vector<T, N> &operator-=(const vector<T, N> &other) noexcept {
+  vector<T, N>& operator-=(const vector<T, N>& other
+  ) noexcept {
     for (std::size_t i = 0; i < N; i++) {
       content[i] -= other[i];
     }
     return *this;
   }
 
-  vector<T, N> operator*(const T &scalar) const noexcept {
+  vector<T, N> operator*(const T& scalar) const noexcept {
     auto copy = *this;
     return copy *= scalar;
   }
 
-  vector<T, N> &operator*=(const T &scalar) noexcept {
+  vector<T, N>& operator*=(const T& scalar) noexcept {
     for (std::size_t i = 0; i < N; i++) {
       content[i] *= scalar;
     }
     return *this;
   }
 
-  const T &operator[](std::size_t i) const { return content[i]; }
+  const T& operator[](std::size_t i) const {
+    return content[i];
+  }
 
-  T &operator[](std::size_t i) { return content[i]; }
+  T& operator[](std::size_t i) { return content[i]; }
 
   static vector zero() noexcept {
     vector zero;
@@ -75,7 +77,8 @@ protected:
 };
 
 template <typename T, typename U, std::size_t N>
-vector<U, N> map(const vector<T, N> &vec, const std::function<U(T)> &f) {
+vector<U, N>
+map(const vector<T, N>& vec, const std::function<U(T)>& f) {
   auto copy = vec;
   for (std::size_t i = 0; i < N; i++) {
     copy[i] = f(vec[i]);
@@ -84,7 +87,9 @@ vector<U, N> map(const vector<T, N> &vec, const std::function<U(T)> &f) {
 }
 
 template <typename T, std::size_t N>
-T combine(const vector<T, N> &a, const vector<T, N> &x) noexcept {
+T combine(
+    const vector<T, N>& a, const vector<T, N>& x
+) noexcept {
   T sum = 0;
   for (std::size_t i = 0; i < N; i++) {
     sum += a[i] * x[i];
@@ -93,7 +98,9 @@ T combine(const vector<T, N> &a, const vector<T, N> &x) noexcept {
 }
 
 template <typename T, std::size_t N>
-std::ostream &operator<<(std::ostream &stream, const vector<T, N> &vector) {
+std::ostream& operator<<(
+    std::ostream& stream, const vector<T, N>& vector
+) {
   stream << "{ ";
   for (std::size_t i = 0; i < N - 1; i++) {
     stream << vector[i] << ", ";
@@ -106,7 +113,9 @@ std::ostream &operator<<(std::ostream &stream, const vector<T, N> &vector) {
 }
 
 template <typename T, std::size_t N>
-std::istream &operator<<(std::istream &stream, const vector<T, N> &vector) {
+std::istream& operator<<(
+    std::istream& stream, const vector<T, N>& vector
+) {
   for (std::size_t i = 0; i < N; i++) {
     stream >> vector[i];
   }

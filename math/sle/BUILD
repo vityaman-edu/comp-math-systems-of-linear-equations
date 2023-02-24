@@ -1,0 +1,10 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "lib",
+    hdrs = glob(["**/*.h"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//math/linal:lib",
+    ]
+)

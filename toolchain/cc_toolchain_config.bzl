@@ -51,6 +51,7 @@ def _impl(ctx):
                                 "-isystem", "/usr/include",
                                 "-std=c++17",
                                 "-stdlib=libc++",
+                                "-O3"
                             ],
                         ),
                     ]),

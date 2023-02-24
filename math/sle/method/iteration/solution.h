@@ -1,11 +1,11 @@
 #pragma once
 #include "math/linal/matrix.h"
-#include "math/linal/vector.h"
 #include "valid-sle.h"
 #include <cmath>
 #include <functional>
 #include <iostream>
 
+namespace math {
 namespace sle {
 namespace method {
 namespace iteration {
@@ -16,57 +16,68 @@ build_alpha(const valid_sle<T, N>& sle) {
   linal::matrix<T, N, N> alpha;
   for (std::size_t i = 0; i < N; i++) {
     for (std::size_t j = 0; j < N; j++) {
-      alpha[i][j] = -sle.left()[i][j] / sle.left()[i][i];
+      alpha(i, j) = -sle.left()(i, j) / sle.left()(i, i);
     }
   }
   for (std::size_t i = 0; i < N; i++) {
-    alpha[i][i] = 0;
+    alpha(i, i) = 0;
   }
   return alpha;
 }
 
 template <typename T, std::size_t N>
-static linal::vector<T, N>
-build_beta(const valid_sle<T, N>& sle) {
-  linal::vector<T, N> beta;
+static linal::matrix<T, N, 1> build_beta(const valid_sle<T, N>& sle
+) {
+  linal::matrix<T, N, 1> beta;
   for (std::size_t i = 0; i < N; i++) {
-    beta[i] = sle.right()[i] / sle.left()[i][i];
+    beta(i, 0) = sle.right()(i, 0) / sle.left()(i, i);
   }
   return beta;
 }
 
 template <typename T, std::size_t N>
-T max_component(const linal::vector<T, N>& x) noexcept {
-  T max = x[0];
+linal::matrix<T, N, 1> abs(const linal::matrix<T, N, 1>& x) noexcept {
+  linal::matrix<T, N, 1> result;
   for (std::size_t i = 1; i < N; i++) {
-    max = std::max(max, x[i]);
+    result(i, 0) = std::fabs(x(i, 0));
+  }
+  return result;
+}
+
+template <typename T, std::size_t N>
+T max_component(const linal::matrix<T, N, 1>& x) noexcept {
+  T max = x(0, 0);
+  for (std::size_t i = 1; i < N; i++) {
+    max = std::max(max, x(i, 0));
   }
   return max;
 }
 
 template <typename T, std::size_t N> struct result {
-  linal::vector<T, N> value;
+  linal::matrix<T, N, 1> value;
   std::size_t steps_count;
-  linal::vector<T, N> error;
+  linal::matrix<T, N, 1> error;
 };
 
 template <typename T, std::size_t N>
-result<T, N>
-solve(const valid_sle<T, N>& sle, const T eps) {
+result<T, N> solve(const valid_sle<T, N>& sle, const T eps) {
   const auto alpha = build_alpha(sle);
   const auto beta = build_beta(sle);
 
   std::size_t steps_count = 0;
-  linal::vector<T, N> x, prev;
+  linal::matrix<T, N, 1> x = beta;
+  linal::matrix<T, N, 1> prev = beta;
+  std::cout << &x << ' ' << &prev << std::endl;
   do {
     prev = x;
-    x = alpha * x;
-    x += beta;
+    std::cout << 111 << prev << std::endl;
+    x = alpha * x;  
+    std::cout << 222 << prev << std::endl;
+    x = x + beta;
+    std::cout << 333 << prev << std::endl << std::endl;
 
     steps_count += 1;
-    auto error = linal::map<T, T, N>(prev - x, [](T v) {
-      return std::fabs(v);
-    });
+    auto error = abs(prev - x);
 
     if (max_component<T, N>(error) < eps) {
       return {
@@ -80,3 +91,4 @@ solve(const valid_sle<T, N>& sle, const T eps) {
 } // namespace iteration
 } // namespace method
 } // namespace sle
+} // namespace math

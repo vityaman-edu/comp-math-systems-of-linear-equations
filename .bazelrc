@@ -1,4 +1,5 @@
 build:clang_config --crosstool_top=//toolchain:clang_suite
 build:clang_config --cpu=k8
 build:clang_config --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+
 build --config=clang_config

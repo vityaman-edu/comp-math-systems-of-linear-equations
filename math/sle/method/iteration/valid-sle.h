@@ -1,21 +1,22 @@
 #pragma once
 #include "math/linal/matrix.h"
-#include "math/linal/vector.h"
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <set>
 #include <stdexcept>
+#include <iostream>
 
+namespace math {
 namespace sle {
 namespace method {
 namespace iteration {
 
 template <typename T, std::size_t N>
-static T sum_by_abs(const linal::vector<T, N>& vector) {
+static T sum_by_abs(const linal::matrix<T, 1, N>& vector) {
   T sum = 0;
   for (std::size_t i = 0; i < N; i++) {
-    sum += std::fabs(vector[i]);
+    sum += std::fabs(vector(0, i));
   }
   return sum;
 }
@@ -23,20 +24,18 @@ static T sum_by_abs(const linal::vector<T, N>& vector) {
 template <typename T, std::size_t N> class valid_sle {
 private:
   linal::matrix<T, N, N> a;
-  linal::vector<T, N> b;
+  linal::matrix<T, N, 1> b;
 
 public:
   const linal::matrix<T, N, N>& left() const noexcept {
     return a;
   }
 
-  const linal::vector<T, N>& right() const noexcept {
-    return b;
-  }
+  const linal::matrix<T, N, 1>& right() const noexcept { return b; }
 
   static valid_sle make(
       const linal::matrix<T, N, N>& a,
-      const linal::vector<T, N>& b
+      const linal::matrix<T, N, 1>& b
   ) {
     std::set<std::size_t> row_candidates[N];
     for (std::size_t i = 0; i < N; i++) {
@@ -44,10 +43,10 @@ public:
     }
 
     for (std::size_t i = 0; i < N; i++) {
-      const auto& row = a[i];
+      auto row = a.row_at(i);
       T row_abs_sum = sum_by_abs(row);
       for (std::size_t j = 0; j < N; j++) {
-        if (row_abs_sum <= 2 * std::fabs(row[j])) {
+        if (row_abs_sum <= 2 * std::fabs(row(0, j))) {
           row_candidates[j].insert(i);
         }
       }
@@ -62,9 +61,7 @@ public:
           return row_candidates[i].size() <
                  row_candidates[j].size();
         };
-    std::sort(
-        indexes, indexes + N, less_by_candidates_count
-    );
+    std::sort(indexes, indexes + N, less_by_candidates_count);
 
     std::size_t suitable[N];
     std::set<std::size_t> used_rows;
@@ -98,8 +95,8 @@ public:
 
     valid_sle<T, N> result;
     for (std::size_t i = 0; i < N; i++) {
-      result.a[i] = a[suitable[i]];
-      result.b[i] = b[suitable[i]];
+      result.a.row_set(i, a.row_at(suitable[i]));
+      result.b(i, 0) = b(suitable[i], 0);
     }
     return result;
   }
@@ -108,3 +105,4 @@ public:
 } // namespace iteration
 } // namespace method
 } // namespace sle
+} // namespace math

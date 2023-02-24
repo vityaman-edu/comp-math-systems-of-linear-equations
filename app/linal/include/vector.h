@@ -20,14 +20,6 @@ public:
 
   vector(const vector<T, N> &other) : vector(other.content) {}
 
-  vector operator-() const noexcept {
-    auto copy = *this;
-    for (std::size_t i = 0; i < N; i++) {
-      copy[i] += this[i];
-    }
-    return copy;
-  }
-
   vector operator+(const vector &other) const noexcept {
     auto copy = *this;
     copy += other;

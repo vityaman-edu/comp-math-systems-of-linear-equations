@@ -15,10 +15,18 @@ public:
     }
   }
 
+  matrix(const matrix &other) : matrix() {
+    auto self = *this;
+    for (std::size_t i = 0; i < R; i++) {
+      for (std::size_t j = 0; j < C; j++) {
+        self[i][j] = other[i][j];
+      }
+    }
+  }
+
   matrix operator*(const T &scalar) noexcept {
     matrix copy = *this;
     return copy *= scalar;
-    ;
   }
 
   matrix &operator*=(const T &scalar) noexcept {

@@ -1,6 +1,7 @@
 #include "app/linal/include/matrix.h"
 #include "app/linal/include/vector.h"
 #include "app/sle/include/method/iteration/solution.h"
+#include "app/sle/include/method/gauss/solution.h"
 #include <fstream>
 #include <iostream>
 
@@ -17,7 +18,7 @@ void vector_print(
   if (1 < n) {
     std::cout << vec[n - 1];
   }
-  std::cout << " }"  << std::endl;
+  std::cout << " }" << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -75,6 +76,9 @@ int main(int argc, char **argv) {
     b[i] = DUMMY;
   }
 
+  sle::method::gauss::solve(a, b);
+  return 0;
+
   try {
     auto sle = sle::method::iteration::valid_sle<F, N>::make(a, b);
     auto result = sle::method::iteration::solve(sle, eps);
@@ -84,5 +88,8 @@ int main(int argc, char **argv) {
   } catch (std::logic_error &e) {
     std::cerr << "error: " << e.what() << std::endl;
   }
+
+  
+
   return 0;
 }

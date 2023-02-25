@@ -39,7 +39,7 @@ template <typename T, std::size_t N>
 linal::fixed_matrix<T, N, 1> abs(const linal::fixed_matrix<T, N, 1>& x
 ) noexcept {
   linal::fixed_matrix<T, N, 1> result;
-  for (std::size_t i = 1; i < N; i++) {
+  for (std::size_t i = 0; i < N; i++) {
     result(i, 0) = std::fabs(x(i, 0));
   }
   return result;

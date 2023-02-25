@@ -57,7 +57,13 @@ int main(int argc, char** argv) {
     b(i, 0) = DUMMY;
   }
 
+  std::cout << "Solving using gauss method..." << std::endl;
+  auto result = math::sle::method::gauss::solve(a, b);
+  vector_print("result = ", result, size);
+  std::cout << std::endl;
+  
   try {
+    std::cout << "Solving using iteration method..." << std::endl;
     using math::sle::method::iteration::valid_sle;
     auto sle = valid_sle<F, N>::make(a, b);
     auto result = math::sle::method::iteration::solve(sle, eps);

@@ -15,13 +15,31 @@ template <typename T> struct max_by_abs_result {
 template <typename T, std::size_t N>
 max_by_abs_result<T>
 find_max_by_abs(const linal::matrix<T, N, N>& a) {
-  max_by_abs_result<T> result = {.row = 0, .col = 0};
+  std::size_t row = 0;
+  std::size_t col = 0;
   for (std::size_t i = 0; i < N; i++) {
     for (std::size_t j = 0; j < N; j++) {
-      if (result.value < std::abs(a(i, j))) {
-        result = {.row = i, .col = j};
+      if (std::abs(a(row, col)) < std::abs(a(i, j))) {
+        row = i;
+        col = j;
       }
     }
+  }
+  return {.row = row, .col = col};
+}
+
+template <typename T, std::size_t N>
+linal::matrix<T, N + 1, 1> vec_insert(
+    const linal::matrix<T, N, 1>& a, T value, std::size_t c
+) {
+  linal::matrix<T, N + 1, 1> result;
+  for (std::size_t i = 0, ii = 0; i < N + 1; i++) {
+    if (i == c) {
+      result(i, 0) = value;
+      continue;
+    }
+    result(i, 0) = a(ii, 0);
+    ii++;
   }
   return result;
 }
@@ -42,21 +60,32 @@ linal::matrix<T, N, 1> solve(
     const linal::matrix<T, N, 1>& b
 ) {
   auto mx = find_max_by_abs(a);
-  auto row = mx.i, col = mx.j;
-  auto removed_row = a.row_at(row).without_col(col);
+  auto row = mx.row, col = mx.col;
+  auto removed_row = linal::row(a[row]).without_col(col);
   auto next_a = a.without_row(row).without_col(col);
-  auto next_b = b.without_col(row);
+  auto next_b = b.without_row(row);
 
   for (std::size_t i = 0, next_i = 0; i < N; i++) {
     if (i == row) {
       continue;
     }
-    auto m = (a[i][col] / mx.value);
-    std::cout << "m(" << b[i] << ") = " << m << std::endl;
-    next_a[next_i] -= removed_row * m;
-    next_b[next_i] -= b(i, 0) * m;
+    auto m = a(i, col) / a(row, col);
+    auto t = removed_row * m;
+    next_a[next_i] -= linal::view(t);
+    next_b(next_i, 0) -= b(i, 0) * m;
     next_i++;
   }
+
+  auto sub = solve<T, N - 1>(next_a, next_b);
+  auto res = vec_insert<T, N - 1>(sub, 0, row);
+
+  auto x = b(row, 0);
+  for (std::size_t j = 0; j < N - 1; j++) {
+    x -= removed_row(0, j) * sub(j, 0);
+  }
+  res(row, 0) = x / a(row, col);
+
+  return res;
 }
 
 }

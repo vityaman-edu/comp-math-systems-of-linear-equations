@@ -19,6 +19,13 @@ public:
     return *this;
   }
 
+  row_view<T, N>& operator-=(row_view<T, N> other) noexcept {
+    for (std::size_t i = 0; i < N; i++) {
+      data[i] -= other.data[i];
+    }
+    return *this;
+  }
+
   const T& operator[](std::size_t i) const { return data[i]; }
 
   T& operator[](std::size_t i) { return data[i]; }
@@ -104,7 +111,7 @@ public:
       if (i == r) {
         continue;
       }
-      result.row_set(ii, (*this)[i]);
+      result[ii] = (*this)[i];
       ii++;
     }
     return result;
@@ -112,12 +119,6 @@ public:
 
   matrix<T, R, C - 1> without_col(std::size_t c) const noexcept {
     return this->transposed().without_row(c).transposed();
-  }
-
-  matrix<T, R, C - 1> with_row(
-      std::size_t at, const matrix<T, 1, C>& row
-  ) const noexcept {
-    return this->transposed().without_row(at).transposed();
   }
 
   const row_view<T, C> operator[](std::size_t i) const {
@@ -129,7 +130,7 @@ public:
   }
 
   matrix<T, C, R> transposed() const noexcept {
-    matrix<T, R, C> result;
+    matrix<T, C, R> result;
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         result(j, i) = data[i][j];
@@ -174,16 +175,35 @@ matrix<T, R, N> operator*(
 
 template <typename T, std::size_t N>
 std::ostream&
-operator<<(std::ostream& stream, const matrix<T, N, 1>& vector) {
+operator<<(std::ostream& stream, const row_view<T, N>& row) {
   stream << "{ ";
   for (std::size_t i = 0; i < N - 1; i++) {
-    stream << vector(i, 0) << ", ";
+    stream << row[i] << ", ";
   }
   if (N > 0) {
-    stream << vector(N - 1, 0);
+    stream << row[N - 1];
   }
   stream << " }";
   return stream;
+}
+
+template <typename T, std::size_t N>
+row_view<T, N> view(matrix<T, 1, N>& row) {
+  return row[0];
+}
+
+template <typename T, std::size_t N>
+matrix<T, N, 1> column(row_view<T, N> view) {
+  matrix<T, N, 1> column;
+  for (std::size_t i = 0; i < N; i++) {
+    column(i, 0) = view[i];
+  }
+  return column;
+}
+
+template <typename T, std::size_t N>
+matrix<T, 1, N> row(row_view<T, N> view) {
+  return column(view).transposed();
 }
 
 } // namespace linal

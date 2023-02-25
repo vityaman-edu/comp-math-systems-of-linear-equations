@@ -7,12 +7,28 @@
 namespace math {
 namespace linal {
 
+template <typename T, std::size_t N> class row_view {
+public:
+  // Note: don't use it
+  row_view(T* data) : data(data) {}
+
+  row_view<T, N>& operator=(row_view<T, N> other) noexcept {
+    for (std::size_t i = 0; i < N; i++) {
+      data[i] = other.data[i];
+    }
+    return *this;
+  }
+
+  const T& operator[](std::size_t i) const { return data[i]; }
+
+  T& operator[](std::size_t i) { return data[i]; }
+
+private:
+  T* data;
+};
+
 template <typename T, std::size_t R, std::size_t C>
 class matrix {
-
-public:
-  T data[R][C];
-
 public:
   matrix() {
     for (std::size_t i = 0; i < R; i++) {
@@ -82,17 +98,42 @@ public:
     return data[i][j];
   }
 
-  void
-  row_set(std::size_t i, const matrix<T, 1, C>& row) noexcept {
-    for (std::size_t j = 0; j < C; j++) {
-      data[i][j] = row(0, j);
+  matrix<T, R - 1, C> without_row(std::size_t r) const noexcept {
+    matrix<T, R - 1, C> result;
+    for (std::size_t i = 0, ii = 0; i < R; i++) {
+      if (i == r) {
+        continue;
+      }
+      result.row_set(ii, (*this)[i]);
+      ii++;
     }
+    return result;
   }
 
-  matrix<T, 1, C> row_at(std::size_t i) const {
-    matrix<T, 1, C> result;
-    for (std::size_t j = 0; j < C; j++) {
-      result(0, j) = data[i][j];
+  matrix<T, R, C - 1> without_col(std::size_t c) const noexcept {
+    return this->transposed().without_row(c).transposed();
+  }
+
+  matrix<T, R, C - 1> with_row(
+      std::size_t at, const matrix<T, 1, C>& row
+  ) const noexcept {
+    return this->transposed().without_row(at).transposed();
+  }
+
+  const row_view<T, C> operator[](std::size_t i) const {
+    return row_view<T, C>((T*)data[i]);
+  }
+
+  row_view<T, C> operator[](std::size_t i) {
+    return row_view<T, C>((T*)data[i]);
+  }
+
+  matrix<T, C, R> transposed() const noexcept {
+    matrix<T, R, C> result;
+    for (std::size_t i = 0; i < R; i++) {
+      for (std::size_t j = 0; j < C; j++) {
+        result(j, i) = data[i][j];
+      }
     }
     return result;
   }
@@ -106,6 +147,9 @@ public:
     }
     return zero;
   }
+
+private:
+  T data[R][C];
 };
 
 template <
@@ -131,14 +175,14 @@ matrix<T, R, N> operator*(
 template <typename T, std::size_t N>
 std::ostream&
 operator<<(std::ostream& stream, const matrix<T, N, 1>& vector) {
-  // stream << "{ ";
+  stream << "{ ";
   for (std::size_t i = 0; i < N - 1; i++) {
     stream << vector(i, 0) << ", ";
   }
   if (N > 0) {
     stream << vector(N - 1, 0);
   }
-  // stream << " }";
+  stream << " }";
   return stream;
 }
 

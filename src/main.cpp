@@ -1,5 +1,7 @@
 #include "math/linal/matrix.h"
+#include "math/sle/method/gauss/solution.h"
 #include "math/sle/method/iteration/solution.h"
+#include "math/sle/method/iteration/valid-sle.h"
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -38,10 +40,10 @@ int main(int argc, char** argv) {
   std::cin >> size;
 
   // TODO: walkaround UB
-  math::linal::matrix<F, N, N> a =
-      math::linal::matrix<F, N, N>::zero();
-  math::linal::matrix<F, N, 1> b =
-      math::linal::matrix<F, N, 1>::zero();
+  math::linal::matrix<F, N, N> a
+      = math::linal::matrix<F, N, N>::zero();
+  math::linal::matrix<F, N, 1> b
+      = math::linal::matrix<F, N, 1>::zero();
 
   for (std::size_t i = 0; i < size; i++) {
     for (std::size_t j = 0; j < size; j++) {
@@ -56,11 +58,8 @@ int main(int argc, char** argv) {
   }
 
   try {
-    auto sle =
-        math::sle::method::iteration::valid_sle<F, N>::make(
-            a, b
-        );
-
+    using math::sle::method::iteration::valid_sle;
+    auto sle = valid_sle<F, N>::make(a, b);
     auto result = math::sle::method::iteration::solve(sle, eps);
     vector_print("result.value = ", result.value, size);
     vector_print("result.error = ", result.error, size);

@@ -10,3 +10,6 @@ BinPackArguments: false
 BinPackParameters: false
 DerivePointerAlignment: false
 PointerAlignment: Left
+BreakBeforeBinaryOperators: All
+AlignArrayOfStructures: Left
+FixNamespaceComments: false

@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <iostream>
 #include <set>
 #include <stdexcept>
-#include <iostream>
 
 namespace math {
 namespace sle {
@@ -13,10 +13,10 @@ namespace method {
 namespace iteration {
 
 template <typename T, std::size_t N>
-static T sum_by_abs(const linal::matrix<T, 1, N>& vector) {
+static T sum_by_abs(const linal::row_view<T, N>& row) {
   T sum = 0;
   for (std::size_t i = 0; i < N; i++) {
-    sum += std::fabs(vector(0, i));
+    sum += std::fabs(row[i]);
   }
   return sum;
 }
@@ -31,7 +31,9 @@ public:
     return a;
   }
 
-  const linal::matrix<T, N, 1>& right() const noexcept { return b; }
+  const linal::matrix<T, N, 1>& right() const noexcept {
+    return b;
+  }
 
   static valid_sle make(
       const linal::matrix<T, N, N>& a,
@@ -43,10 +45,10 @@ public:
     }
 
     for (std::size_t i = 0; i < N; i++) {
-      auto row = a.row_at(i);
+      auto row = a[i];
       T row_abs_sum = sum_by_abs(row);
       for (std::size_t j = 0; j < N; j++) {
-        if (row_abs_sum <= 2 * std::fabs(row(0, j))) {
+        if (row_abs_sum <= 2 * std::fabs(row[j])) {
           row_candidates[j].insert(i);
         }
       }
@@ -56,11 +58,11 @@ public:
     for (std::size_t i = 0; i < N; i++) {
       indexes[i] = i;
     }
-    auto less_by_candidates_count =
-        [row_candidates](std::size_t i, std::size_t j) {
-          return row_candidates[i].size() <
-                 row_candidates[j].size();
-        };
+    auto less_by_candidates_count
+        = [row_candidates](std::size_t i, std::size_t j) {
+            return row_candidates[i].size()
+                   < row_candidates[j].size();
+          };
     std::sort(indexes, indexes + N, less_by_candidates_count);
 
     std::size_t suitable[N];
@@ -95,7 +97,7 @@ public:
 
     valid_sle<T, N> result;
     for (std::size_t i = 0; i < N; i++) {
-      result.a.row_set(i, a.row_at(suitable[i]));
+      result.a[i] = a[suitable[i]];
       result.b(i, 0) = b(suitable[i], 0);
     }
     return result;

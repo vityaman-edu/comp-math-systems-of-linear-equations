@@ -30,9 +30,9 @@ int main(int argc, char** argv) {
     freopen(filename.c_str(), "r", stdin);
   }
 
-  const std::size_t N = 20;
+  const std::size_t N = 5;
   typedef double F;
-  const F DUMMY = 600;
+  const F DUMMY = 1;
 
   F eps;
   std::cin >> eps;
@@ -56,9 +56,10 @@ int main(int argc, char** argv) {
   }
 
   std::cout << "Solving using gauss method..." << std::endl;
-  auto peek = &math::sle::method::gauss::peek_max_by_abs<F>;
+  auto peek = &math::sle::method::gauss::peek_top_left<F>;
   auto result = gauss::solve<F, N>(a, b, peek);
-  vector_print("result = ", result, size);
+  vector_print("result.value = ", result.value, size);
+  std::cout << "|result.det| = " << result.det << std::endl;
   std::cout << std::endl;
 
   try {

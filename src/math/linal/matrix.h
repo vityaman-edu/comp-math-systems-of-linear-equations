@@ -205,10 +205,16 @@ operator<<(std::ostream& stream, const row_view<T, N>& row) {
 
 template <typename T, std::size_t N>
 std::ostream&
-operator<<(std::ostream& stream, const fixed_matrix<T, N, 1>& row) {
-  auto t = row.transposed();
+operator<<(std::ostream& stream, const fixed_matrix<T, N, 1>& column) {
+  auto t = column.transposed();
   stream << view(t);
   return stream;
+}
+
+template <typename T, std::size_t N>
+std::ostream&
+operator<<(std::ostream& stream, const fixed_matrix<T, 1, N>& row) {
+  return stream << row.transposed();
 }
 
 template <typename T, std::size_t N>

@@ -53,19 +53,25 @@ template <typename T>
 using element_peeker
     = std::function<peek(const linal::matrix<T>&)>;
 
+template <typename T, std::size_t N> struct result {
+  linal::fixed_matrix<T, N, 1> value;
+  linal::fixed_matrix<T, N, N> matrix;
+  T det;
+};
+
 template <typename T, std::size_t N = 1>
-linal::fixed_matrix<T, 1, 1> solve(
+result<T, 1> solve(
     const linal::fixed_matrix<T, 1, 1>& a,
     const linal::fixed_matrix<T, 1, 1>& b,
     const element_peeker<T>& peek
 ) {
   auto result = linal::fixed_matrix<T, 1, 1>();
   result(0, 0) = b(0, 0) / a(0, 0);
-  return result;
+  return {.value = result, .matrix = a, .det = 1};
 }
 
 template <typename T, std::size_t N>
-linal::fixed_matrix<T, N, 1> solve(
+result<T, N> solve(
     const linal::fixed_matrix<T, N, N>& a,
     const linal::fixed_matrix<T, N, 1>& b,
     const element_peeker<T>& peek
@@ -73,6 +79,7 @@ linal::fixed_matrix<T, N, 1> solve(
   auto mx = peek(a);
   auto row = mx.row, col = mx.col;
   auto removed_row = linal::row(a[row]).without_col(col);
+  std::cout << linal::row(a[row]) * (1 / a(row, col)) << std::endl;
   auto next_a = a.without_row(row).without_col(col);
   auto next_b = b.without_row(row);
 
@@ -88,15 +95,18 @@ linal::fixed_matrix<T, N, 1> solve(
   }
 
   auto sub = solve<T, N - 1>(next_a, next_b, peek);
-  auto res = vec_insert<T, N - 1>(sub, 0, row);
+  auto res = vec_insert<T, N - 1>(sub.value, 0, row);
 
   auto x = b(row, 0);
   for (std::size_t j = 0; j < N - 1; j++) {
-    x -= removed_row(0, j) * sub(j, 0);
+    x -= removed_row(0, j) * sub.value(j, 0);
   }
   res(row, 0) = x / a(row, col);
 
-  return res;
+  return {
+      .value = res,
+      .matrix = linal::fixed_matrix<T, N, N>::zero(),
+      .det = sub.det * a(row, col)};
 }
 
 }

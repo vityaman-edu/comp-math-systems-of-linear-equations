@@ -10,6 +10,9 @@
 # Bazel
 bazel-*
 
+# CMake
+build/
+
 # VSCode
 .vscode/
 

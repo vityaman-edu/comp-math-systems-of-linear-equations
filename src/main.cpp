@@ -3,14 +3,13 @@
 #include "math/sle/method/iteration/solution.h"
 #include "math/sle/method/iteration/valid-sle.h"
 #include <fstream>
+#include <functional>
 #include <iostream>
-#include <iterator>
-#include <type_traits>
 
 template <typename T, std::size_t N>
 void vector_print(
     const std::string& prefix,
-    const math::linal::matrix<T, N, 1>& vec,
+    const math::linal::fixed_matrix<T, N, 1>& vec,
     std::size_t n
 ) {
   std::cout << prefix << " { ";
@@ -24,13 +23,15 @@ void vector_print(
 }
 
 int main(int argc, char** argv) {
+  using namespace math::sle::method;
+
   if (argc > 1) {
     std::string filename(argv[1]);
     freopen(filename.c_str(), "r", stdin);
   }
 
   const std::size_t N = 20;
-  typedef float F;
+  typedef double F;
   const F DUMMY = 600;
 
   F eps;
@@ -39,11 +40,8 @@ int main(int argc, char** argv) {
   std::size_t size;
   std::cin >> size;
 
-  // TODO: walkaround UB
-  math::linal::matrix<F, N, N> a
-      = math::linal::matrix<F, N, N>::zero();
-  math::linal::matrix<F, N, 1> b
-      = math::linal::matrix<F, N, 1>::zero();
+  math::linal::fixed_matrix<F, N, N> a;
+  math::linal::fixed_matrix<F, N, 1> b;
 
   for (std::size_t i = 0; i < size; i++) {
     for (std::size_t j = 0; j < size; j++) {
@@ -58,15 +56,17 @@ int main(int argc, char** argv) {
   }
 
   std::cout << "Solving using gauss method..." << std::endl;
-  auto result = math::sle::method::gauss::solve(a, b);
+  auto peek = &math::sle::method::gauss::peek_max_by_abs<F>;
+  auto result = gauss::solve<F, N>(a, b, peek);
   vector_print("result = ", result, size);
   std::cout << std::endl;
-  
+
   try {
-    std::cout << "Solving using iteration method..." << std::endl;
-    using math::sle::method::iteration::valid_sle;
+    std::cout << "Solving using iteration method..."
+              << std::endl;
+    using iteration::valid_sle;
     auto sle = valid_sle<F, N>::make(a, b);
-    auto result = math::sle::method::iteration::solve(sle, eps);
+    auto result = iteration::solve(sle, eps);
     vector_print("result.value = ", result.value, size);
     vector_print("result.error = ", result.error, size);
     std::cout << "result.steps_count = " << result.steps_count

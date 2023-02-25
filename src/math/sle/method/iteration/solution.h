@@ -11,9 +11,9 @@ namespace method {
 namespace iteration {
 
 template <typename T, std::size_t N>
-static linal::matrix<T, N, N>
+static linal::fixed_matrix<T, N, N>
 build_alpha(const valid_sle<T, N>& sle) {
-  linal::matrix<T, N, N> alpha;
+  linal::fixed_matrix<T, N, N> alpha;
   for (std::size_t i = 0; i < N; i++) {
     for (std::size_t j = 0; j < N; j++) {
       alpha(i, j) = -sle.left()(i, j) / sle.left()(i, i);
@@ -26,9 +26,9 @@ build_alpha(const valid_sle<T, N>& sle) {
 }
 
 template <typename T, std::size_t N>
-static linal::matrix<T, N, 1>
+static linal::fixed_matrix<T, N, 1>
 build_beta(const valid_sle<T, N>& sle) {
-  linal::matrix<T, N, 1> beta;
+  linal::fixed_matrix<T, N, 1> beta;
   for (std::size_t i = 0; i < N; i++) {
     beta(i, 0) = sle.right()(i, 0) / sle.left()(i, i);
   }
@@ -36,9 +36,9 @@ build_beta(const valid_sle<T, N>& sle) {
 }
 
 template <typename T, std::size_t N>
-linal::matrix<T, N, 1> abs(const linal::matrix<T, N, 1>& x
+linal::fixed_matrix<T, N, 1> abs(const linal::fixed_matrix<T, N, 1>& x
 ) noexcept {
-  linal::matrix<T, N, 1> result;
+  linal::fixed_matrix<T, N, 1> result;
   for (std::size_t i = 1; i < N; i++) {
     result(i, 0) = std::fabs(x(i, 0));
   }
@@ -46,7 +46,7 @@ linal::matrix<T, N, 1> abs(const linal::matrix<T, N, 1>& x
 }
 
 template <typename T, std::size_t N>
-T max_component(const linal::matrix<T, N, 1>& x) noexcept {
+T max_component(const linal::fixed_matrix<T, N, 1>& x) noexcept {
   T max = x(0, 0);
   for (std::size_t i = 1; i < N; i++) {
     max = std::max(max, x(i, 0));
@@ -55,9 +55,9 @@ T max_component(const linal::matrix<T, N, 1>& x) noexcept {
 }
 
 template <typename T, std::size_t N> struct result {
-  linal::matrix<T, N, 1> value;
+  linal::fixed_matrix<T, N, 1> value;
   std::size_t steps_count;
-  linal::matrix<T, N, 1> error;
+  linal::fixed_matrix<T, N, 1> error;
 };
 
 template <typename T, std::size_t N>
@@ -66,8 +66,8 @@ result<T, N> solve(const valid_sle<T, N>& sle, const T eps) {
   const auto beta = build_beta(sle);
 
   std::size_t steps_count = 0;
-  linal::matrix<T, N, 1> x = beta;
-  linal::matrix<T, N, 1> prev = beta;
+  linal::fixed_matrix<T, N, 1> x = beta;
+  linal::fixed_matrix<T, N, 1> prev = beta;
   do {
     prev = x;
     x = alpha * x;

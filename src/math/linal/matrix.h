@@ -7,6 +7,14 @@
 namespace math {
 namespace linal {
 
+template <typename T> class matrix {
+public:
+  virtual const T&
+  operator()(std::size_t i, std::size_t j) const = 0;
+  virtual std::size_t rows_count() const = 0;
+  virtual std::size_t cols_count() const = 0;
+};
+
 template <typename T, std::size_t N> class row_view {
 public:
   // Note: don't use it
@@ -35,9 +43,9 @@ private:
 };
 
 template <typename T, std::size_t R, std::size_t C>
-class matrix {
+class fixed_matrix : public matrix<T> {
 public:
-  matrix() {
+  fixed_matrix() {
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         data[i][j] = 0;
@@ -45,7 +53,7 @@ public:
     }
   }
 
-  matrix(const matrix<T, R, C>& other) {
+  fixed_matrix(const fixed_matrix<T, R, C>& other) {
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         data[i][j] = other(i, j);
@@ -53,14 +61,14 @@ public:
     }
   }
 
-  matrix<T, R, C> operator-(const matrix<T, R, C>& other
-  ) const noexcept {
-    matrix<T, R, C> result = *this;
+  fixed_matrix<T, R, C>
+  operator-(const fixed_matrix<T, R, C>& other) const noexcept {
+    fixed_matrix<T, R, C> result = *this;
     result -= other;
     return result;
   }
 
-  void operator-=(const matrix<T, R, C>& other) noexcept {
+  void operator-=(const fixed_matrix<T, R, C>& other) noexcept {
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         data[i][j] -= other(i, j);
@@ -68,8 +76,8 @@ public:
     }
   }
 
-  matrix<T, R, C> operator*(const T& k) const noexcept {
-    matrix<T, R, C> result = *this;
+  fixed_matrix<T, R, C> operator*(const T& k) const noexcept {
+    fixed_matrix<T, R, C> result = *this;
     result *= k;
     return result;
   }
@@ -82,14 +90,14 @@ public:
     }
   }
 
-  matrix<T, R, C> operator+(const matrix<T, R, C>& other
-  ) const noexcept {
-    matrix<T, R, C> result = *this;
+  fixed_matrix<T, R, C>
+  operator+(const fixed_matrix<T, R, C>& other) const noexcept {
+    fixed_matrix<T, R, C> result = *this;
     result += other;
     return result;
   }
 
-  void operator+=(const matrix<T, R, C>& other) noexcept {
+  void operator+=(const fixed_matrix<T, R, C>& other) noexcept {
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         data[i][j] += other(i, j);
@@ -97,7 +105,8 @@ public:
     }
   }
 
-  const T& operator()(std::size_t i, std::size_t j) const {
+  const T&
+  operator()(std::size_t i, std::size_t j) const override {
     return data[i][j];
   }
 
@@ -105,8 +114,9 @@ public:
     return data[i][j];
   }
 
-  matrix<T, R - 1, C> without_row(std::size_t r) const noexcept {
-    matrix<T, R - 1, C> result;
+  fixed_matrix<T, R - 1, C> without_row(std::size_t r
+  ) const noexcept {
+    fixed_matrix<T, R - 1, C> result;
     for (std::size_t i = 0, ii = 0; i < R; i++) {
       if (i == r) {
         continue;
@@ -117,7 +127,8 @@ public:
     return result;
   }
 
-  matrix<T, R, C - 1> without_col(std::size_t c) const noexcept {
+  fixed_matrix<T, R, C - 1> without_col(std::size_t c
+  ) const noexcept {
     return this->transposed().without_row(c).transposed();
   }
 
@@ -129,8 +140,8 @@ public:
     return row_view<T, C>((T*)data[i]);
   }
 
-  matrix<T, C, R> transposed() const noexcept {
-    matrix<T, C, R> result;
+  fixed_matrix<T, C, R> transposed() const noexcept {
+    fixed_matrix<T, C, R> result;
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         result(j, i) = data[i][j];
@@ -139,8 +150,12 @@ public:
     return result;
   }
 
-  static matrix<T, R, C> zero() noexcept {
-    matrix<T, R, C> zero;
+  std::size_t rows_count() const override { return R; }
+
+  std::size_t cols_count() const override { return C; }
+
+  static fixed_matrix<T, R, C> zero() noexcept {
+    fixed_matrix<T, R, C> zero;
     for (std::size_t i = 0; i < R; i++) {
       for (std::size_t j = 0; j < C; j++) {
         zero(i, j) = 0;
@@ -158,10 +173,11 @@ template <
     std::size_t R,
     std::size_t C,
     std::size_t N>
-matrix<T, R, N> operator*(
-    const matrix<T, R, C>& left, const matrix<T, C, N>& right
+fixed_matrix<T, R, N> operator*(
+    const fixed_matrix<T, R, C>& left,
+    const fixed_matrix<T, C, N>& right
 ) noexcept {
-  matrix<T, R, N> result;
+  fixed_matrix<T, R, N> result;
   for (std::size_t i = 0; i < R; i++) {
     for (std::size_t j = 0; j < N; j++) {
       result(i, j) = 0;
@@ -188,13 +204,21 @@ operator<<(std::ostream& stream, const row_view<T, N>& row) {
 }
 
 template <typename T, std::size_t N>
-row_view<T, N> view(matrix<T, 1, N>& row) {
+std::ostream&
+operator<<(std::ostream& stream, const fixed_matrix<T, N, 1>& row) {
+  auto t = row.transposed();
+  stream << view(t);
+  return stream;
+}
+
+template <typename T, std::size_t N>
+row_view<T, N> view(fixed_matrix<T, 1, N>& row) {
   return row[0];
 }
 
 template <typename T, std::size_t N>
-matrix<T, N, 1> column(row_view<T, N> view) {
-  matrix<T, N, 1> column;
+fixed_matrix<T, N, 1> column(row_view<T, N> view) {
+  fixed_matrix<T, N, 1> column;
   for (std::size_t i = 0; i < N; i++) {
     column(i, 0) = view[i];
   }
@@ -202,7 +226,7 @@ matrix<T, N, 1> column(row_view<T, N> view) {
 }
 
 template <typename T, std::size_t N>
-matrix<T, 1, N> row(row_view<T, N> view) {
+fixed_matrix<T, 1, N> row(row_view<T, N> view) {
   return column(view).transposed();
 }
 

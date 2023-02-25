@@ -23,21 +23,21 @@ static T sum_by_abs(const linal::row_view<T, N>& row) {
 
 template <typename T, std::size_t N> class valid_sle {
 private:
-  linal::matrix<T, N, N> a;
-  linal::matrix<T, N, 1> b;
+  linal::fixed_matrix<T, N, N> a;
+  linal::fixed_matrix<T, N, 1> b;
 
 public:
-  const linal::matrix<T, N, N>& left() const noexcept {
+  const linal::fixed_matrix<T, N, N>& left() const noexcept {
     return a;
   }
 
-  const linal::matrix<T, N, 1>& right() const noexcept {
+  const linal::fixed_matrix<T, N, 1>& right() const noexcept {
     return b;
   }
 
   static valid_sle make(
-      const linal::matrix<T, N, N>& a,
-      const linal::matrix<T, N, 1>& b
+      const linal::fixed_matrix<T, N, N>& a,
+      const linal::fixed_matrix<T, N, 1>& b
   ) {
     std::set<std::size_t> row_candidates[N];
     for (std::size_t i = 0; i < N; i++) {

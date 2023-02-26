@@ -13,3 +13,4 @@ PointerAlignment: Left
 BreakBeforeBinaryOperators: All
 AlignArrayOfStructures: Left
 FixNamespaceComments: false
+InsertTrailingCommas: Wrapped

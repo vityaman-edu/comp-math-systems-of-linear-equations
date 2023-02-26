@@ -36,8 +36,8 @@ build_beta(const valid_sle<T, N>& sle) {
 }
 
 template <typename T, std::size_t N>
-linal::fixed_matrix<T, N, 1> abs(const linal::fixed_matrix<T, N, 1>& x
-) noexcept {
+linal::fixed_matrix<T, N, 1>
+abs(const linal::fixed_matrix<T, N, 1>& x) noexcept {
   linal::fixed_matrix<T, N, 1> result;
   for (std::size_t i = 0; i < N; i++) {
     result(i, 0) = std::fabs(x(i, 0));
@@ -56,8 +56,8 @@ T max_component(const linal::fixed_matrix<T, N, 1>& x) noexcept {
 
 template <typename T, std::size_t N> struct result {
   linal::fixed_matrix<T, N, 1> value;
-  std::size_t steps_count;
   linal::fixed_matrix<T, N, 1> error;
+  std::size_t steps_count;
 };
 
 template <typename T, std::size_t N>
@@ -78,8 +78,9 @@ result<T, N> solve(const valid_sle<T, N>& sle, const T eps) {
     if (max_component<T, N>(error) < eps) {
       return {
           .value = x,
+          .error = error,
           .steps_count = steps_count,
-          .error = error};
+      };
     }
   } while (true);
 }

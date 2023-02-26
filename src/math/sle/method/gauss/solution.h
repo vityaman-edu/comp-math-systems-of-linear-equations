@@ -55,7 +55,9 @@ using element_peeker
 
 template <typename T, std::size_t N> struct result {
   linal::fixed_matrix<T, N, 1> value;
-  linal::fixed_matrix<T, N, N> matrix;
+  linal::fixed_matrix<T, N, 1> error;
+  linal::fixed_matrix<T, N, N> a;
+  linal::fixed_matrix<T, N, 1> b;
   T det;
 };
 
@@ -67,7 +69,13 @@ result<T, 1> solve(
 ) {
   auto result = linal::fixed_matrix<T, 1, 1>();
   result(0, 0) = b(0, 0) / a(0, 0);
-  return {.value = result, .matrix = a, .det = 1};
+  return {
+      .value = result,
+      .error = a * result - b,
+      .a = a,
+      .b = b,
+      .det = a(0, 0),
+  };
 }
 
 template <typename T, std::size_t N>
@@ -93,23 +101,30 @@ result<T, N> solve(
     next_i++;
   }
 
-  auto sub = solve<T, N - 1>(next_a, next_b, peek);
-  auto res = vec_insert<T, N - 1>(sub.value, 0, row);
+  auto subres = solve<T, N - 1>(next_a, next_b, peek);
+  auto result_x = vec_insert<T, N - 1>(subres.value, 0, row);
 
   auto x = b(row, 0);
   for (std::size_t j = 0; j < N - 1; j++) {
-    x -= removed_row(0, j) * sub.value(j, 0);
+    x -= removed_row(0, j) * subres.value(j, 0);
   }
-  res(row, 0) = x / a(row, col);
+  result_x(row, 0) = x / a(row, col);
 
-  auto zero = linal::fixed_matrix<T, 1, N - 1>::zero();
+  auto zeroN = linal::fixed_matrix<T, 1, N - 1>::zero();
+  auto zero1 = linal::fixed_matrix<T, 1, 1>::zero();
   auto triangle_row = linal::row(a[row]) * (1 / a(row, col));
+  auto result_a = subres.a.with_col(col, view(zeroN))
+                            .with_row(row, view(triangle_row));
+  auto result_b = subres.b.with_row(row, view(zero1));
+  result_b(row, 0) = b(row, 0) * (1 / a(row, col));
   return {
-      .value = res,
-      .matrix = sub.matrix.with_col(col, view(zero))
-                    .with_row(row, view(triangle_row)),
-      .det = sub.det * a(row, col)
-             * (((col + row) % 2 == 0) ? 1 : -1)};
+      .value = result_x,
+      .error = result_a * result_x - result_b,
+      .a = result_a,
+      .b = result_b,
+      .det = subres.det * a(row, col)
+             * (((col + row) % 2 == 0) ? 1 : -1),
+  };
 }
 
 }

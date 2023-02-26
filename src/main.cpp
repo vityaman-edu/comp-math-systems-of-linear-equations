@@ -39,13 +39,14 @@ void exec_gauss(
   auto peek = &math::sle::method::gauss::peek_max_by_abs<F>;
   auto result = gauss::solve<F, N>(a, b, peek);
   vector_print("result.value = ", result.value, size);
+  vector_print("result.error = ", result.error, size);
   std::cout << "|result.det| = " << result.det << std::endl;
-  std::cout << "result.matrix = " << std::endl;
+  std::cout << "result.(a|b) = " << std::endl;
   for (std::size_t i = 0; i < size; i++) {
     for (std::size_t j = 0; j < size; j++) {
-      std::cout << result.matrix(i, j) << "\t";
+      std::cout << result.a(i, j) << "\t";
     }
-    std::cout << std::endl;
+    std::cout << "| " << result.b(i, 0) << std::endl;
   }
   std::cout << std::endl;
 }

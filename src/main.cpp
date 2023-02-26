@@ -4,6 +4,7 @@
 #include "math/sle/method/iteration/valid-sle.h"
 #include <fstream>
 #include <functional>
+#include <ios>
 #include <iostream>
 
 template <typename T, std::size_t N>
@@ -22,17 +23,56 @@ void vector_print(
   std::cout << " }" << std::endl;
 }
 
-int main(int argc, char** argv) {
+const std::size_t N = 5;
+typedef double F;
+const F DUMMY = 1;
+
+template <typename T, std::size_t N>
+void exec_gauss(
+    const math::linal::fixed_matrix<T, N, N>& a,
+    const math::linal::fixed_matrix<T, N, 1>& b,
+    const std::size_t size
+) {
   using namespace math::sle::method;
+  auto peek = &math::sle::method::gauss::peek_max_by_abs<F>;
+  auto result = gauss::solve<F, N>(a, b, peek);
+  vector_print("result.value = ", result.value, size);
+  std::cout << "|result.det| = " << result.det << std::endl;
+  std::cout << "result.matrix = " << std::endl;
+  for (std::size_t i = 0; i < size; i++) {
+    for (std::size_t j = 0; j < size; j++) {
+      std::cout << result.matrix(i, j) << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+}
+
+template <typename T, std::size_t N>
+void exec_iteration(
+    const math::linal::fixed_matrix<T, N, N>& a,
+    const math::linal::fixed_matrix<T, N, 1>& b,
+    const F eps,
+    const std::size_t size
+) {
+  using namespace math::sle::method;
+  using iteration::valid_sle;
+  auto sle = valid_sle<F, N>::make(a, b);
+  auto result = iteration::solve(sle, eps);
+  vector_print("result.value = ", result.value, size);
+  vector_print("result.error = ", result.error, size);
+  std::cout << "result.steps_count = " << result.steps_count
+            << std::endl;
+}
+
+int main(int argc, char** argv) {
 
   if (argc > 1) {
     std::string filename(argv[1]);
     freopen(filename.c_str(), "r", stdin);
   }
 
-  const std::size_t N = 5;
-  typedef double F;
-  const F DUMMY = 1;
+  std::cout << std::setprecision(3) << std::fixed;
 
   F eps;
   std::cin >> eps;
@@ -56,22 +96,11 @@ int main(int argc, char** argv) {
   }
 
   std::cout << "Solving using gauss method..." << std::endl;
-  auto peek = &math::sle::method::gauss::peek_top_left<F>;
-  auto result = gauss::solve<F, N>(a, b, peek);
-  vector_print("result.value = ", result.value, size);
-  std::cout << "|result.det| = " << result.det << std::endl;
-  std::cout << std::endl;
+  exec_gauss(a, b, size);
 
+  std::cout << "Solving using iteration method..." << std::endl;
   try {
-    std::cout << "Solving using iteration method..."
-              << std::endl;
-    using iteration::valid_sle;
-    auto sle = valid_sle<F, N>::make(a, b);
-    auto result = iteration::solve(sle, eps);
-    vector_print("result.value = ", result.value, size);
-    vector_print("result.error = ", result.error, size);
-    std::cout << "result.steps_count = " << result.steps_count
-              << std::endl;
+    exec_iteration(a, b, eps, size);
   } catch (std::logic_error& e) {
     std::cerr << "error: " << e.what() << std::endl;
   }

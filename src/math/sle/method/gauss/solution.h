@@ -79,7 +79,6 @@ result<T, N> solve(
   auto mx = peek(a);
   auto row = mx.row, col = mx.col;
   auto removed_row = linal::row(a[row]).without_col(col);
-  std::cout << linal::row(a[row]) * (1 / a(row, col)) << std::endl;
   auto next_a = a.without_row(row).without_col(col);
   auto next_b = b.without_row(row);
 
@@ -103,9 +102,12 @@ result<T, N> solve(
   }
   res(row, 0) = x / a(row, col);
 
+  auto zero = linal::fixed_matrix<T, 1, N - 1>::zero();
+  auto triangle_row = linal::row(a[row]) * (1 / a(row, col));
   return {
       .value = res,
-      .matrix = linal::fixed_matrix<T, N, N>::zero(),
+      .matrix = sub.matrix.with_col(col, view(zero))
+                    .with_row(row, view(triangle_row)),
       .det = sub.det * a(row, col)};
 }
 

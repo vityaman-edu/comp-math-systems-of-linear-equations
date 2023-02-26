@@ -132,6 +132,25 @@ public:
     return this->transposed().without_row(c).transposed();
   }
 
+  fixed_matrix<T, R + 1, C>
+  with_row(std::size_t r, row_view<T, C> row) const {
+    fixed_matrix<T, R + 1, C> result;
+    for (std::size_t i = 0, ii = 0; i < R + 1; i++) {
+      if (i == r) {
+        result[i] = row;
+        continue;
+      }
+      result[i] = (*this)[ii];
+      ii++;
+    }
+    return result;
+  }
+
+  fixed_matrix<T, R, C + 1>
+  with_col(std::size_t c, row_view<T, R> col) const {
+    return this->transposed().with_row(c, col).transposed();
+  }
+
   const row_view<T, C> operator[](std::size_t i) const {
     return row_view<T, C>((T*)data[i]);
   }
@@ -204,16 +223,18 @@ operator<<(std::ostream& stream, const row_view<T, N>& row) {
 }
 
 template <typename T, std::size_t N>
-std::ostream&
-operator<<(std::ostream& stream, const fixed_matrix<T, N, 1>& column) {
+std::ostream& operator<<(
+    std::ostream& stream, const fixed_matrix<T, N, 1>& column
+) {
   auto t = column.transposed();
   stream << view(t);
   return stream;
 }
 
 template <typename T, std::size_t N>
-std::ostream&
-operator<<(std::ostream& stream, const fixed_matrix<T, 1, N>& row) {
+std::ostream& operator<<(
+    std::ostream& stream, const fixed_matrix<T, 1, N>& row
+) {
   return stream << row.transposed();
 }
 

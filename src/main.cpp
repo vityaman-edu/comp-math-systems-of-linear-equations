@@ -2,10 +2,12 @@
 #include "math/sle/method/gauss/solution.h"
 #include "math/sle/method/iteration/solution.h"
 #include "math/sle/method/iteration/valid-sle.h"
+#include <exception>
 #include <fstream>
 #include <functional>
 #include <ios>
 #include <iostream>
+#include <stdexcept>
 
 template <typename T, std::size_t N>
 void vector_print(
@@ -41,7 +43,7 @@ void exec_gauss(
   std::cout << "result.matrix = " << std::endl;
   for (std::size_t i = 0; i < size; i++) {
     for (std::size_t j = 0; j < size; j++) {
-      std::cout << result.matrix(i, j) << " ";
+      std::cout << result.matrix(i, j) << "\t";
     }
     std::cout << std::endl;
   }
@@ -101,7 +103,7 @@ int main(int argc, char** argv) {
   std::cout << "Solving using iteration method..." << std::endl;
   try {
     exec_iteration(a, b, eps, size);
-  } catch (std::logic_error& e) {
+  } catch (std::exception& e) {
     std::cerr << "error: " << e.what() << std::endl;
   }
 

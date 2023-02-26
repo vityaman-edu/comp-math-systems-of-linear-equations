@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <set>
 #include <stdexcept>
@@ -80,7 +81,7 @@ public:
       );
 
       if (diff.size() == 0) {
-        throw std::invalid_argument(
+        throw std::logic_error(
             "matrix can't be made diagonal predominant"
         );
       }

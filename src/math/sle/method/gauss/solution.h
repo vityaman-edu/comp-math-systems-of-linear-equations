@@ -108,7 +108,8 @@ result<T, N> solve(
       .value = res,
       .matrix = sub.matrix.with_col(col, view(zero))
                     .with_row(row, view(triangle_row)),
-      .det = sub.det * a(row, col)};
+      .det = sub.det * a(row, col)
+             * (((col + row) % 2 == 0) ? 1 : -1)};
 }
 
 }

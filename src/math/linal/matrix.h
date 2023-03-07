@@ -238,6 +238,18 @@ std::ostream& operator<<(
   return stream << row.transposed();
 }
 
+template <typename T>
+std::ostream&
+operator<<(std::ostream& stream, const matrix<T>& matrix) {
+  for (std::size_t i = 0; i < matrix.rows_count(); i++) {
+    for (std::size_t j = 0; j < matrix.cols_count(); j++) {
+      stream << matrix(i, j) << ' ';
+    }
+    stream << '\n';
+  }
+  return stream;
+}
+
 template <typename T, std::size_t N>
 row_view<T, N> view(fixed_matrix<T, 1, N>& row) {
   return row[0];

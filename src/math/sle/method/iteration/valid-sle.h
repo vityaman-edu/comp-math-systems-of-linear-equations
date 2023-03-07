@@ -49,7 +49,7 @@ public:
       auto row = a[i];
       T row_abs_sum = sum_by_abs(row);
       for (std::size_t j = 0; j < N; j++) {
-        if (row_abs_sum <= 2 * std::fabs(row[j])) {
+        if (row_abs_sum < 2 * std::fabs(row[j])) {
           row_candidates[j].insert(i);
         }
       }
